@@ -83,7 +83,7 @@ const CreateNewContent = (prop: PROP) => {
 
       {/* Output Section - Reduce Width */}
       <div className="col-span-1 md:col-span-2">
-        <OutputSection aiOutput={generatedContent} />
+        <OutputSection aiOutput={generatedContent} selectedTemplate={selectedTemplate} />
       </div>
 
       <div>

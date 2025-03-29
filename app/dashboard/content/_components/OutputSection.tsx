@@ -1,37 +1,46 @@
-import React, { useEffect, useRef } from "react";
-
-import "@toast-ui/editor/dist/toastui-editor.css";
-import { Editor } from "@toast-ui/react-editor";
-import CopyButton from "../../_components/CopyButton";
+import { useEffect } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 interface PROPS {
   aiOutput: string;
+  selectedTemplate?: { name: string };
 }
 
-const OutputSection = ({ aiOutput }: PROPS) => {
-  const editorRef: any = useRef(null);
+const OutputSection = ({ aiOutput, selectedTemplate }: PROPS) => {
+  const storageKey = `editorContent_${selectedTemplate?.name}`; // Generate a unique storage key for each template
 
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: localStorage.getItem(storageKey) || "", // Initial content
+  });
+
+  // Update editor content when aiOutput changes
   useEffect(() => {
-    const editorInstance = editorRef.current.getInstance();
-    editorInstance.setMarkdown(aiOutput);
-  }, [aiOutput]);
+    if (editor && aiOutput) {
+      editor.commands.setContent(aiOutput);
+      localStorage.setItem(storageKey, aiOutput);
+    }
+  }, [aiOutput, editor]);
 
   return (
-    <div className="bg-white shadow-lg border rounded-lg  mx-auto">
+    <div className="bg-white shadow-lg border rounded-lg mx-auto">
       <div className="flex justify-between items-center p-5">
-        <h2 className="font-medium text-lg">Your Result</h2>
-        <CopyButton textToCopy={aiOutput} />
+        <h2 className="font-medium text-lg">
+          {aiOutput ? "Your Result" : "your result will appear here"}
+        </h2>
+        <hr />
       </div>
-      <Editor
-        ref={editorRef}
-        initialValue="Your Result will be here"
-        initialEditType="wysiwyg"
-        height="600px"
-        useCommandShortcut={true}
-        onChange={() =>
-          console.log(editorRef.current.getInstance().getMarkdown())
-        }
+      <EditorContent
+        editor={editor}
+        className="h-screen p-4 focus:outline-none"
       />
+      {/* {editor && (
+        <>
+          <FloatingMenu editor={editor}>This is the floating menu</FloatingMenu>
+          <BubbleMenu editor={editor}>This is the bubble menu</BubbleMenu>
+        </>
+      )} */}
     </div>
   );
 };
